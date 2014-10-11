@@ -9,8 +9,7 @@ from email.header import decode_header
 import email.utils
 
 # Settings
-box="/home/noqqe/Maildir/INBOX/"
-box = mailbox.Maildir(box, factory=mailbox.MaildirMessage)
+boxesdir="/home/noqqe/Maildir/"
 people = dict()
 mailYear = dict()
 mailMonth = dict()
@@ -23,40 +22,40 @@ def getHeader(msg,header):
    m = m[0][0] # transform list(tuple()) into str()
    return m
 
+def scoreMap(value,map):
+    if value in map:
+        map[value] += 1
+    else:
+        map[value] = 1
+
 # Functions (high level)
 def senderList(msg):
     f = getHeader(msg,"From")
-    if f in people:
-        people[f] += 1
-    else:
-        people[f] = 1
+    scoreMap(f,people)
 
 def mailDate(msg):
     date = getHeader(msg,"Date")
-    date = email.utils.parsedate(date)
-    full = time.strftime("%F %H:%M:%S", date)
-    y = time.strftime("%Y", date)
-    if y in mailYear:
-        mailYear[y] += 1
-    else:
-        mailYear[y] = 1
-    m = time.strftime("%m", date)
-    if m in mailMonth:
-        mailMonth[m] += 1
-    else:
-        mailMonth[m] = 1
-    d = time.strftime("%d", date)
-    if d in mailDay:
-        mailDay[d] += 1
-    else:
-        mailDay[d] = 1
+    try:
+        date = email.utils.parsedate(date)
+        full = time.strftime("%F %H:%M:%S", date)
+        scoreMap(time.strftime("%Y", date),mailYear)
+        scoreMap(time.strftime("%m", date),mailMonth)
+        scoreMap(time.strftime("%d", date),mailDay)
+    except:
+        pass 
  
 # Runtime
-for msg in box:
-    #senderList(msg)
-    mailDate(msg)
+for box in os.listdir(boxesdir):
+    print box
+    try: 
+        maildir = mailbox.Maildir(boxesdir + box, factory=mailbox.MaildirMessage)
+        for msg in maildir:
+            senderList(msg)
+            mailDate(msg)
+    except:
+        pass
 
-#print sorted(people.items(), key=operator.itemgetter(1)) 
+print sorted(people.items(), key=operator.itemgetter(1)) 
 print sorted(mailYear.items(), key=operator.itemgetter(1)) 
 print sorted(mailMonth.items(), key=operator.itemgetter(1)) 
 print sorted(mailDay.items(), key=operator.itemgetter(1)) 
