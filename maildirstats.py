@@ -36,6 +36,7 @@ def scoreMap(value,map):
 # Functions (high level)
 def senderList(msg):
     f = getHeader(msg,"From")
+    f = re.sub(r'.*<(.*)>.*',r'\1',f)
     scoreMap(f,people)
 
 def mailDate(msg):
@@ -51,7 +52,6 @@ def mailDate(msg):
  
 # Runtime
 for box in dirs:
-    print box
     try: 
         maildir = mailbox.Maildir(boxesdir + box, factory=mailbox.MaildirMessage)
         for msg in maildir:
@@ -60,8 +60,23 @@ for box in dirs:
     except:
         pass
 
-print sorted(people.items(), key=operator.itemgetter(1)) 
-print sorted(mailYear.items(), key=operator.itemgetter(1)) 
-print sorted(mailMonth.items(), key=operator.itemgetter(1)) 
-print sorted(mailDay.items(), key=operator.itemgetter(1)) 
+print "### People"
+for x in sorted(people.items(), key=operator.itemgetter(1)):
+    print str(x[1])+": "+str(x[0])  
+print ""
+
+print "### Year"
+for x in sorted(mailYear.items(), key=operator.itemgetter(0)):
+    print str(x[0])+": "+str(x[1])  
+print ""
+
+print "### Month"
+for x in sorted(mailMonth.items(), key=operator.itemgetter(0)):
+    print str(x[0])+": "+str(x[1])  
+print ""
+
+print "### Day"
+for x in sorted(mailDay.items(), key=operator.itemgetter(0)):
+    print str(x[0])+": "+str(x[1])  
+print ""
 
