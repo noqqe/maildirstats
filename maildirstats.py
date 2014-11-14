@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os
+import re
+import sh
 import sys
 import time
 import mailbox
@@ -10,6 +12,9 @@ import email.utils
 
 # Settings
 boxesdir="/home/noqqe/Maildir/"
+blacklist="(Archives.TMT*|Spam|Archives.noris*|.mairixdb|Archives.*Social|.*Tech)"
+dirs = [k for k in os.listdir(boxesdir) if re.match(blacklist,k) is None ]
+
 people = dict()
 mailYear = dict()
 mailMonth = dict()
@@ -45,7 +50,7 @@ def mailDate(msg):
         pass 
  
 # Runtime
-for box in os.listdir(boxesdir):
+for box in dirs:
     print box
     try: 
         maildir = mailbox.Maildir(boxesdir + box, factory=mailbox.MaildirMessage)
