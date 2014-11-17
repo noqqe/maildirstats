@@ -2,19 +2,28 @@
 
 import os
 import re
-import sh
 import sys
 import time
 import mailbox
 import operator
-from email.header import decode_header
 import email.utils
+from email.header import decode_header
 
-# Settings
-boxesdir="/home/noqqe/Maildir/"
-blacklist="(Archives.TMT*|Spam|Archives.noris*|.mairixdb|Archives.*Social|.*Tech)"
-dirs = [k for k in os.listdir(boxesdir) if re.match(blacklist,k) is None ]
+### Settings
+# Path to your Maildir directory
+maildirpath="/home/noqqe/Maildir/"
 
+# Blacklist regex here (uncomment and fill with regex if you want to enable)
+#blacklist="(Spam|.mairixdb|Archives.*Social|.*Tech)"
+
+### Runtime
+# Generate list of maildirs without blacklisted ones
+try:
+    dirs = [k for k in os.listdir(maildirpath) if re.match(blacklist,k) is None ]
+except:
+    dirs = os.listdir(maildirpath)
+
+# Initialize objects
 people = dict()
 mailYear = dict()
 mailMonth = dict()
@@ -22,6 +31,7 @@ mailDay = dict()
 mailWeekday = dict()
 mailHour = dict()
 mailMinute = dict()
+xmailers = dict()
 
 # Functions (low level)
 def getHeader(msg,header):
@@ -56,18 +66,27 @@ def mailDate(msg):
     except:
         pass
 
-# Runtime
+def mailers(msg):
+    m = getHeader(msg,"X-Mailer")
+    scoreMap(m,xmailers)
+
 for box in dirs:
     try:
-        maildir = mailbox.Maildir(boxesdir + box, factory=mailbox.MaildirMessage)
+        maildir = mailbox.Maildir(maildirpath + box, factory=mailbox.MaildirMessage)
         for msg in maildir:
             senderList(msg)
             mailDate(msg)
+            mailers(msg)
     except:
         pass
 
 print "### People"
 for x in sorted(people.items(), key=operator.itemgetter(1)):
+    print str(x[1])+": "+str(x[0])
+print ""
+
+print "### X-Mailer"
+for x in sorted(xmailers.items(), key=operator.itemgetter(1)):
     print str(x[1])+": "+str(x[0])
 print ""
 
