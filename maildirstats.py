@@ -14,7 +14,7 @@ from email.header import decode_header
 maildirpath="/home/noqqe/Maildir/"
 
 # Blacklist regex here (uncomment and fill with regex if you want to enable)
-#blacklist="(Spam|.mairixdb|Archives.*Social|.*Tech)"
+#blacklist="(Spam|\\.mairixdb|Archives.*Social|.*Tech)"
 
 ### Runtime
 # Generate list of maildirs without blacklisted ones
