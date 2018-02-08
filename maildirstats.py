@@ -11,7 +11,7 @@ from email.header import decode_header
 
 ### Settings
 # Path to your Maildir directory
-maildirpath="/home/noqqe/Maildir/"
+maildirpath=sys.argv[1]
 
 # Blacklist regex here (uncomment and fill with regex if you want to enable)
 #blacklist="(Spam|\\.mairixdb|Archives.*Social|.*Tech)"
